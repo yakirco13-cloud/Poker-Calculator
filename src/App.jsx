@@ -9,6 +9,7 @@ export default function PokerCalculator() {
   const [showResults, setShowResults] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   const addPlayer = () => {
     const newId = Math.max(...players.map(p => p.id), 0) + 1;
@@ -146,7 +147,8 @@ export default function PokerCalculator() {
     const text = generateShareText();
     try {
       await navigator.clipboard.writeText(text);
-      alert('הועתק ללוח!');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
@@ -461,20 +463,37 @@ export default function PokerCalculator() {
                 </h2>
                 
                 {/* Share Button */}
-                <div className="relative">
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setShowShareMenu(!showShareMenu)}
-                    className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg sm:rounded-xl text-white/80 hover:text-white transition-all duration-300 border border-white/10"
+                    onClick={copyToClipboard}
+                    className={`flex items-center justify-center w-10 h-10 rounded-lg sm:rounded-xl transition-all duration-300 border border-white/10 ${copied ? 'bg-emerald-500/30 text-emerald-400' : 'bg-white/10 hover:bg-white/20 text-white/80 hover:text-white'}`}
+                    title="העתק"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="18" cy="5" r="3"/>
-                      <circle cx="6" cy="12" r="3"/>
-                      <circle cx="18" cy="19" r="3"/>
-                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                    </svg>
-                    <span className="text-sm font-medium hidden sm:inline">שתף</span>
+                    {copied ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                      </svg>
+                    )}
                   </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowShareMenu(!showShareMenu)}
+                      className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg sm:rounded-xl text-white/80 hover:text-white transition-all duration-300 border border-white/10"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="18" cy="5" r="3"/>
+                        <circle cx="6" cy="12" r="3"/>
+                        <circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                      </svg>
+                      <span className="text-sm font-medium hidden sm:inline">שתף</span>
+                    </button>
                   
                   {/* Share Menu Dropdown */}
                   {showShareMenu && (
@@ -532,21 +551,10 @@ export default function PokerCalculator() {
                           </div>
                           <span>אימייל</span>
                         </button>
-                        <button
-                          onClick={copyToClipboard}
-                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 text-white/80 hover:text-white transition-colors text-right border-t border-white/10"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center flex-shrink-0">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                            </svg>
-                          </div>
-                          <span>העתק</span>
-                        </button>
                       </div>
                     </>
                   )}
+                  </div>
                 </div>
               </div>
               
