@@ -125,7 +125,7 @@ export default function PokerCalculator() {
 
   const shareWhatsApp = () => {
     const text = generateShareText();
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     setShowShareMenu(false);
   };
 
@@ -138,7 +138,7 @@ export default function PokerCalculator() {
 
   const shareTelegram = () => {
     const text = generateShareText();
-    window.open(`https://t.me/share/url?text=${encodeURIComponent(text)}`, '_blank');
+    window.location.href = `https://t.me/share/url?url=&text=${encodeURIComponent(text)}`;
     setShowShareMenu(false);
   };
 
@@ -149,6 +149,21 @@ export default function PokerCalculator() {
       alert('הועתק ללוח!');
     } catch (err) {
       console.error('Failed to copy:', err);
+    }
+    setShowShareMenu(false);
+  };
+
+  const nativeShare = async () => {
+    const text = generateShareText();
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'סיכום ערב פוקר',
+          text: text
+        });
+      } catch (err) {
+        console.error('Share failed:', err);
+      }
     }
     setShowShareMenu(false);
   };
@@ -233,13 +248,13 @@ export default function PokerCalculator() {
                 <div key={player.id} className="group">
                   {/* Mobile Layout */}
                   <div className="sm:hidden bg-white/5 rounded-xl p-3 space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <input
                         type="text"
                         placeholder="שם השחקן"
                         value={player.name}
                         onChange={(e) => updatePlayer(player.id, 'name', e.target.value)}
-                        className="flex-1 bg-transparent border-none text-white placeholder-white/30 focus:outline-none text-lg font-medium"
+                        className="flex-1 bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-lg font-medium"
                       />
                       {players.length > 1 && (
                         <button
@@ -258,7 +273,9 @@ export default function PokerCalculator() {
                       <div className="flex-1">
                         <label className="text-xs text-white/40 mb-1 block">קנייה</label>
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           placeholder="0"
                           value={player.buyIn}
                           onChange={(e) => updatePlayer(player.id, 'buyIn', e.target.value)}
@@ -268,7 +285,9 @@ export default function PokerCalculator() {
                       <div className="flex-1">
                         <label className="text-xs text-white/40 mb-1 block">יציאה</label>
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           placeholder="0"
                           value={player.cashOut}
                           onChange={(e) => updatePlayer(player.id, 'cashOut', e.target.value)}
@@ -301,7 +320,9 @@ export default function PokerCalculator() {
                     </div>
                     <div className="col-span-3">
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         placeholder="0"
                         value={player.buyIn}
                         onChange={(e) => updatePlayer(player.id, 'buyIn', e.target.value)}
@@ -310,7 +331,9 @@ export default function PokerCalculator() {
                     </div>
                     <div className="col-span-3">
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         placeholder="0"
                         value={player.cashOut}
                         onChange={(e) => updatePlayer(player.id, 'cashOut', e.target.value)}
@@ -458,6 +481,23 @@ export default function PokerCalculator() {
                     <>
                       <div className="fixed inset-0 z-0" onClick={() => setShowShareMenu(false)}></div>
                       <div className="absolute left-0 top-full mt-2 bg-slate-800 rounded-xl border border-white/10 shadow-2xl overflow-hidden z-10 min-w-44">
+                        {typeof navigator !== 'undefined' && navigator.share && (
+                          <button
+                            onClick={nativeShare}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 text-white/80 hover:text-white transition-colors text-right border-b border-white/10"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="18" cy="5" r="3"/>
+                                <circle cx="6" cy="12" r="3"/>
+                                <circle cx="18" cy="19" r="3"/>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                              </svg>
+                            </div>
+                            <span>שתף...</span>
+                          </button>
+                        )}
                         <button
                           onClick={shareWhatsApp}
                           className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 text-white/80 hover:text-white transition-colors text-right"
